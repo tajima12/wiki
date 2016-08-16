@@ -105,6 +105,8 @@ func (s *Server) Route() {
 
 	s.Engine.GET("/", article.Root)
 	s.Engine.GET("/article/:id", article.Get)
+	s.Engine.POST("/article/:id/comment/save", article.Comment)
+
 	s.Engine.GET("/signup", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "signup.tmpl", gin.H{
 			"csrf": csrf.GetToken(c),

@@ -17,6 +17,12 @@ type Article struct {
 	DB *sql.DB
 }
 
+type Comment struct {
+	Comment string
+}
+
+var comments []Comment
+
 // Root indicates / path as top page.
 func (t *Article) Root(c *gin.Context) {
 	articles, err := model.ArticlesAll(t.DB)
@@ -44,10 +50,13 @@ func (t *Article) Get(c *gin.Context) {
 		c.String(500, "%s", err)
 		return
 	}
+	token := csrf.GetToken(c)
 	c.HTML(http.StatusOK, "article.tmpl", gin.H{
-		"title":   fmt.Sprintf("%s - go-wiki", article.Title),
-		"article": article,
-		"context": c,
+		"title":    fmt.Sprintf("%s - go-wiki", article.Title),
+		"article":  article,
+		"csrf":     token,
+		"context":  c,
+		"comments": comments,
 	})
 }
 
@@ -147,4 +156,27 @@ func (t *Article) Delete(c *gin.Context) {
 	})
 
 	c.Redirect(301, "/")
+}
+
+func (t *Article) Comment(c *gin.Context) {
+	comment := c.PostForm("comment")
+	comments = append(comments, Comment{comment})
+	id := c.Param("id")
+	aid, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		c.String(500, "%s", err)
+		return
+	}
+	article, err := model.ArticleOne(t.DB, aid)
+	if err != nil {
+		c.String(500, "%s", err)
+		return
+	}
+	c.HTML(http.StatusOK, "article.tmpl", gin.H{
+		"title":    fmt.Sprintf("%s - go-wiki", article.Title),
+		"article":  article,
+		"csrf":     csrf.GetToken(c),
+		"context":  c,
+		"comments": comments,
+	})
 }
