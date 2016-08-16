@@ -18,10 +18,11 @@ type Article struct {
 }
 
 type Comment struct {
+	Name    string
 	Comment string
 }
 
-var comments []Comment
+var comments = map[string][]Comment{}
 
 // Root indicates / path as top page.
 func (t *Article) Root(c *gin.Context) {
@@ -56,7 +57,7 @@ func (t *Article) Get(c *gin.Context) {
 		"article":  article,
 		"csrf":     token,
 		"context":  c,
-		"comments": comments,
+		"comments": comments[id],
 	})
 }
 
@@ -159,24 +160,10 @@ func (t *Article) Delete(c *gin.Context) {
 }
 
 func (t *Article) Comment(c *gin.Context) {
+	name := CurrentName(c)
 	comment := c.PostForm("comment")
-	comments = append(comments, Comment{comment})
 	id := c.Param("id")
-	aid, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
-		c.String(500, "%s", err)
-		return
-	}
-	article, err := model.ArticleOne(t.DB, aid)
-	if err != nil {
-		c.String(500, "%s", err)
-		return
-	}
-	c.HTML(http.StatusOK, "article.tmpl", gin.H{
-		"title":    fmt.Sprintf("%s - go-wiki", article.Title),
-		"article":  article,
-		"csrf":     csrf.GetToken(c),
-		"context":  c,
-		"comments": comments,
-	})
+	newComment := Comment{Name: name, Comment: comment}
+	comments[id] = append(comments[id], newComment)
+	c.Redirect(301, fmt.Sprint("/article/", id))
 }
