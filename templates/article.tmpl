@@ -9,6 +9,7 @@
     <article>
         <header>
             <h2>{{ .article.Title }}</h2>
+            <p>created by {{ .article.User }}</p>
             <p>posted on today {{.article.Created}}</p>
             <p>updated {{.article.Updated}}</p>
         </header>

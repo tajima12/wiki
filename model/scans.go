@@ -50,6 +50,7 @@ func ScanArticle(r *sql.Row) (Article, error) {
 		&s.ID,
 		&s.Title,
 		&s.Body,
+		&s.User,
 		&s.Created,
 		&s.Updated,
 	); err != nil {
@@ -67,6 +68,7 @@ func ScanArticles(rs *sql.Rows) ([]Article, error) {
 			&s.ID,
 			&s.Title,
 			&s.Body,
+			&s.User,
 			&s.Created,
 			&s.Updated,
 		); err != nil {

@@ -118,6 +118,7 @@ func (t *Article) Save(c *gin.Context) {
 	var article model.Article
 	article.Body = c.PostForm("body")
 	article.Title = c.PostForm("title")
+	article.User = CurrentName(c)
 
 	id := c.PostForm("id")
 	if id == "" {

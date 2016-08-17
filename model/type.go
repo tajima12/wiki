@@ -20,6 +20,7 @@ type Article struct {
 	ID      int64      `json:"id"`
 	Title   string     `json:"title"`
 	Body    string     `json:"body"`
+	User    string     `json:"user"`
 	Created *time.Time `json:"created"`
 	Updated *time.Time `json:"updated"`
 }

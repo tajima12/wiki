@@ -33,14 +33,14 @@ func (t *Article) Update(tx *sql.Tx) (sql.Result, error) {
 // Insert inserts new article.
 func (t *Article) Insert(tx *sql.Tx) (sql.Result, error) {
 	stmt, err := tx.Prepare(`
-	insert into articles (title, body)
-	values(?, ?)
+	insert into articles (title, body, user)
+	values(?, ?, ?)
 	`)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
-	return stmt.Exec(t.Title, t.Body)
+	return stmt.Exec(t.Title, t.Body, t.User)
 }
 
 // Delete deletes article by given id.
