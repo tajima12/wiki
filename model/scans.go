@@ -80,3 +80,24 @@ func ScanArticles(rs *sql.Rows) ([]Article, error) {
 	return structs, nil
 }
 
+func ScanComments(rs *sql.Rows) ([]Comment, error) {
+	structs := make([]Comment, 0, 16)
+	var err error
+	for rs.Next() {
+		var s Comment
+		if err = rs.Scan(
+			&s.ID,
+			&s.ArticleID,
+			&s.Body,
+			&s.Created,
+			&s.Updated,
+		); err != nil {
+			return nil, err
+		}
+		structs = append(structs, s)
+	}
+	if err = rs.Err(); err != nil {
+		return nil, err
+	}
+	return structs, nil
+}

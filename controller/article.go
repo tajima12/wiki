@@ -17,13 +17,6 @@ type Article struct {
 	DB *sql.DB
 }
 
-type Comment struct {
-	Name    string
-	Comment string
-}
-
-var comments = map[string][]Comment{}
-
 // Root indicates / path as top page.
 func (t *Article) Root(c *gin.Context) {
 	articles, err := model.ArticlesAll(t.DB)
@@ -51,13 +44,18 @@ func (t *Article) Get(c *gin.Context) {
 		c.String(500, "%s", err)
 		return
 	}
+	comments, err := model.CommentAll(t.DB, int(aid))
+	if err != nil {
+		c.String(500, "%s", err)
+		return
+	}
 	token := csrf.GetToken(c)
 	c.HTML(http.StatusOK, "article.tmpl", gin.H{
 		"title":    fmt.Sprintf("%s - go-wiki", article.Title),
 		"article":  article,
 		"csrf":     token,
 		"context":  c,
-		"comments": comments[id],
+		"comments": comments,
 	})
 }
 
@@ -160,10 +158,20 @@ func (t *Article) Delete(c *gin.Context) {
 }
 
 func (t *Article) Comment(c *gin.Context) {
-	name := CurrentName(c)
 	comment := c.PostForm("comment")
-	id := c.Param("id")
-	newComment := Comment{Name: name, Comment: comment}
-	comments[id] = append(comments[id], newComment)
-	c.Redirect(301, fmt.Sprint("/article/", id))
+	idStr := c.Param("id")
+	intId, _ := strconv.Atoi(idStr)
+	var id int64
+	TXHandler(c, t.DB, func(tx *sql.Tx) error {
+		result, err := model.NewComment(tx, intId, comment)
+		if err != nil {
+			return err
+		}
+		if err := tx.Commit(); err != nil {
+			return err
+		}
+		id, err = result.LastInsertId()
+		return err
+	})
+	c.Redirect(301, fmt.Sprint("/article/", idStr))
 }

@@ -78,7 +78,7 @@ func (s *Server) Route() {
 	article := &controller.Article{DB: s.db}
 	user := &controller.User{DB: s.db}
 
-	auth := s.Engine.Group("/")
+	auth := s.Engine.Group("/") // ログイン済み出ないと見れないようにしている
 	auth.Use(controller.AuthRequired())
 	{
 		auth.GET("/authtest", func(c *gin.Context) {
