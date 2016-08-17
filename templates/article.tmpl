@@ -20,7 +20,7 @@
         <h3>Comments</h3>
         {{range .comments}}
             <li>
-              <p>{{ .Body }}</p>
+              <p>{{ .User }}: {{ .Body }}</p>
             </li>
         {{end}}
         <form action="/article/{{.article.ID}}/comment/save" method="POST">

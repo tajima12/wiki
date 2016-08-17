@@ -157,21 +157,25 @@ func (t *Article) Delete(c *gin.Context) {
 	c.Redirect(301, "/")
 }
 
+// Comment is endpoint for add comment
 func (t *Article) Comment(c *gin.Context) {
+	user := CurrentName(c)
 	comment := c.PostForm("comment")
 	idStr := c.Param("id")
-	intId, _ := strconv.Atoi(idStr)
-	var id int64
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.String(500, "%s", err)
+		return
+	}
 	TXHandler(c, t.DB, func(tx *sql.Tx) error {
-		result, err := model.NewComment(tx, intId, comment)
+		_, err := model.NewComment(tx, id, comment, user)
 		if err != nil {
 			return err
 		}
 		if err := tx.Commit(); err != nil {
 			return err
 		}
-		id, err = result.LastInsertId()
-		return err
+		return nil
 	})
 	c.Redirect(301, fmt.Sprint("/article/", idStr))
 }

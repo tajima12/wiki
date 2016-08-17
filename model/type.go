@@ -24,10 +24,12 @@ type Article struct {
 	Updated *time.Time `json:"updated"`
 }
 
+// Comment returns model object for comment.
 type Comment struct {
 	ID        int        `json:"id"`
 	ArticleID int        `json:"article_id"`
 	Body      string     `json:"body"`
+	User      string     `json:"user"`
 	Created   *time.Time `json:"created"`
 	Updated   *time.Time `json:"updated"`
 }
