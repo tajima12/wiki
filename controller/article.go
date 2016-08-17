@@ -25,9 +25,10 @@ func (t *Article) Root(c *gin.Context) {
 		return
 	}
 	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"title":    "wiki wiki",
-		"articles": articles,
-		"context":  c,
+		"title":      "wiki wiki",
+		"articles":   articles,
+		"articleNum": len(articles),
+		"context":    c,
 	})
 }
 
